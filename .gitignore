@@ -1,0 +1,43 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+
+# Node.js
+node_modules/
+.next/
+.cache/
+dist/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Config (sensitive)
+config/
+*.pickle
+
+# Logs
+*.log
+logs/
+
+# Generated files
+*.xlsx
+!Portfolio_Wins_Tracker.xlsx
+
+# Streamlit
+.streamlit/secrets.toml
+
+# Exclude impact-microsite from deployment (separate project)
+impact-microsite/
