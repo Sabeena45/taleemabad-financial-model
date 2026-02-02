@@ -879,7 +879,7 @@ with tab6:
     with col3:
         avg_cost = (
             UNIT_ECONOMICS["niete_ict"]["students"] * UNIT_ECONOMICS["niete_ict"]["cost_per_child"] +
-            UNIT_ECONOMICS["rawalpindi"]["students"] * UNIT_ECONOMICS["rawalpindi"]["cost_per_child"]
+            UNIT_ECONOMICS["prevail_rawalpindi"]["students"] * UNIT_ECONOMICS["prevail_rawalpindi"]["cost_per_child"]
         ) / current_students
         st.metric("Avg Cost/Student", f"${avg_cost:.2f}")
 
