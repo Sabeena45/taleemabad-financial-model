@@ -882,13 +882,13 @@ with tab6:
             UNIT_ECONOMICS["niete_ict"]["students"] * UNIT_ECONOMICS["niete_ict"]["cost_per_child"] +
             UNIT_ECONOMICS["prevail_rawalpindi"]["students"] * UNIT_ECONOMICS["prevail_rawalpindi"]["cost_per_child"]
         ) / current_students
-        st.metric("Avg Cost/Student (Variable)", f"${avg_cost:.2f}")
+        st.metric("Avg Cost/Student/Year", f"${avg_cost:.2f}")
 
     st.markdown("---")
 
     # NIETE ICT Contract Breakdown
     st.subheader("📊 NIETE ICT Contract Breakdown (Islamabad)")
-    st.caption(f"Duration: {NIETE_ICT_CONTRACT['start_date']} - {NIETE_ICT_CONTRACT['end_date']} ({NIETE_ICT_CONTRACT['duration_months']} months)")
+    st.caption(f"Duration: {NIETE_ICT_CONTRACT['start_date']} - {NIETE_ICT_CONTRACT['end_date']} ({NIETE_ICT_CONTRACT['duration_months']} months = {UNIT_ECONOMICS['niete_ict']['duration_years']} years)")
 
     breakdown_col1, breakdown_col2 = st.columns(2)
 
@@ -914,19 +914,21 @@ with tab6:
         ])
         st.dataframe(variable_costs, hide_index=True, use_container_width=True)
 
-    # Total contract summary
-    total_col1, total_col2, total_col3 = st.columns(3)
+    # Total contract summary - Per Year metrics
+    total_col1, total_col2, total_col3, total_col4 = st.columns(4)
     with total_col1:
-        st.metric("Total Contract", f"${NIETE_ICT_CONTRACT['total_usd']:,}", help="771,376,857 PKR")
+        st.metric("Total Contract", f"${NIETE_ICT_CONTRACT['total_usd']:,}", help="771,376,857 PKR over 27 months")
     with total_col2:
-        st.metric("Cost/Child (Variable)", f"${UNIT_ECONOMICS['niete_ict']['cost_per_child']:.2f}", help="Variable costs ÷ 90,000 students")
+        st.metric("Cost/Child/Year (Variable)", f"${UNIT_ECONOMICS['niete_ict']['cost_per_child']:.2f}", help="Variable costs ÷ students ÷ 2.25 years")
     with total_col3:
-        st.metric("Cost/Child (Total)", f"${UNIT_ECONOMICS['niete_ict']['cost_per_child_total']:.2f}", help="Total contract ÷ 90,000 students")
+        st.metric("Cost/Child/Year (Total)", f"${UNIT_ECONOMICS['niete_ict']['cost_per_child_total']:.2f}", help="Total contract ÷ students ÷ 2.25 years")
+    with total_col4:
+        st.metric("Rawalpindi Cost/Year", f"${UNIT_ECONOMICS['prevail_rawalpindi']['cost_per_child']:.2f}", help="$250K ÷ 37K students ÷ 1.92 years")
 
     st.markdown("---")
 
     # Growth calculator
-    st.subheader("Growth Funding Calculator")
+    st.subheader("Growth Funding Calculator (Annual Cost)")
 
     col1, col2 = st.columns([1, 1])
 
@@ -940,40 +942,41 @@ with tab6:
         )
 
         cost_per_student = st.select_slider(
-            "Cost per Student",
-            options=[6.76, 10.0, 15.0, 20.0, 23.90, 25.0, 30.29, 35.0, 40.0],
-            value=23.90,
-            help="Rawalpindi: $6.76/child | NIETE ICT: $23.90/child (variable) or $30.29/child (total)"
+            "Cost per Student per Year",
+            options=[3.53, 5.0, 7.5, 10.0, 10.62, 12.5, 13.46, 15.0, 20.0],
+            value=10.62,
+            help="Rawalpindi: $3.53/child/yr | NIETE ICT: $10.62/child/yr (variable) or $13.46/child/yr (total)"
         )
 
         additional_students = target_students - current_students
-        additional_funding = additional_students * cost_per_student
+        additional_funding_annual = additional_students * cost_per_student
 
         st.metric("Additional Students", f"{additional_students:,}")
-        st.metric("Additional Funding Needed", format_currency(additional_funding))
+        st.metric("Additional Funding/Year", format_currency(additional_funding_annual))
 
     with col2:
-        st.subheader("Cost Comparison")
+        st.subheader("Cost Comparison (Per Year)")
 
         cost_comparison = pd.DataFrame([
-            {"Program": "NIETE ICT (Variable)", "Cost/Student": 23.90, "Students": 90000, "Contract": "$2.15M", "Duration": "Apr 2024 - Jun 2026"},
-            {"Program": "NIETE ICT (Total)", "Cost/Student": 30.29, "Students": 90000, "Contract": "$2.73M", "Duration": "Apr 2024 - Jun 2026"},
-            {"Program": "Rawalpindi", "Cost/Student": 6.76, "Students": 37000, "Contract": "$250K", "Duration": "Aug 2025 - Jun 2027"},
+            {"Program": "NIETE ICT (Variable)", "Cost/Student/Year": 10.62, "Students": 90000, "Contract": "$2.15M var", "Duration": "2.25 years"},
+            {"Program": "NIETE ICT (Total)", "Cost/Student/Year": 13.46, "Students": 90000, "Contract": "$2.73M total", "Duration": "2.25 years"},
+            {"Program": "Rawalpindi", "Cost/Student/Year": 3.53, "Students": 37000, "Contract": "$250K", "Duration": "1.92 years"},
         ])
 
         fig = px.bar(
             cost_comparison,
             x="Program",
-            y="Cost/Student",
+            y="Cost/Student/Year",
             color="Program",
-            text="Cost/Student",
+            text="Cost/Student/Year",
         )
         fig.update_layout(height=350, showlegend=False)
-        fig.update_traces(texttemplate="$%{text:.1f}", textposition="outside")
+        fig.update_traces(texttemplate="$%{text:.1f}/yr", textposition="outside")
         st.plotly_chart(fig, use_container_width=True)
 
-        st.caption("**Variable costs** = operational + recruitment + management fee (per-child related)")
-        st.caption("**Total costs** = variable + fixed (research, CPD, establishment)")
+        st.caption("💡 **All costs shown are per child per year**")
+        st.caption("**Variable** = operational + recruitment + management (per-child related)")
+        st.caption("**Total** = variable + fixed (research, CPD, establishment)")
 
     # Partner revenue projections
     st.subheader("Partner Revenue Projections")

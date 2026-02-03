@@ -292,29 +292,38 @@ NIETE_ICT_CONTRACT = {
     "variable_costs_usd": 2151352,  # Sum of variable costs (for cost per child calc)
 }
 
-# Unit economics - Updated with variable costs for cost per child
-# NIETE ICT (Islamabad): Apr 2024 - Jun 2026 (27 months) - uses variable costs
-# Prevail Rawalpindi: Aug 2025 - Jun 2027 (23 months)
+# Unit economics - Cost per child PER YEAR
+# NIETE ICT (Islamabad): Apr 2024 - Jun 2026 (27 months = 2.25 years)
+# Prevail Rawalpindi: Aug 2025 - Jun 2027 (23 months = 1.92 years)
 UNIT_ECONOMICS = {
     "niete_ict": {
         "students": 90000,
         "total_contract_usd": 2726287,  # 771,376,857 PKR at 283
         "fixed_costs_usd": 574360,
         "variable_costs_usd": 2151352,
-        "cost_per_child": 23.90,  # USD (variable costs / students)
-        "cost_per_child_total": 30.29,  # USD (total contract / students)
+        # Per-year costs (primary metric)
+        "cost_per_child": 10.62,  # USD/year (variable costs / students / 2.25 years)
+        "cost_per_child_total": 13.46,  # USD/year (total contract / students / 2.25 years)
+        # Full contract costs (for reference)
+        "cost_per_child_contract": 23.90,  # USD total (variable costs / students)
+        "cost_per_child_contract_total": 30.29,  # USD total (total contract / students)
         "start_date": "Apr 2024",
         "end_date": "Jun 2026",
         "duration_months": 27,
+        "duration_years": 2.25,
         "location": "Islamabad",
     },
     "prevail_rawalpindi": {
         "students": 37000,
         "total_contract_usd": 250000,
-        "cost_per_child": 6.76,  # USD (total contract / students)
+        # Per-year costs (primary metric)
+        "cost_per_child": 3.53,  # USD/year (total contract / students / 1.92 years)
+        # Full contract costs (for reference)
+        "cost_per_child_contract": 6.76,  # USD total (total contract / students)
         "start_date": "Aug 2025",
         "end_date": "Jun 2027",
         "duration_months": 23,
+        "duration_years": 1.92,
         "location": "Rawalpindi",
     },
 }
