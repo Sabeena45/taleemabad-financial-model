@@ -43,6 +43,7 @@ from data.budget_2026 import (
     FUNDRAISING_TARGET,
     BANK_BALANCES,
     EXPENSES,
+    SUBSCRIPTIONS,
 )
 from models.cashflow_model import CashFlowModel
 from models.scenario_model import ScenarioModel, ScenarioType
@@ -307,13 +308,14 @@ if CHATBOT_AVAILABLE:
 
 
 # Main content with tabs
-tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
+tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs([
     "📊 Executive Summary",
     "💰 Cash Flow",
     "🎯 Scenarios",
     "🛡️ Grant Risk",
     "⏱️ Runway",
     "📈 Growth",
+    "🔍 Insights",
 ])
 
 
@@ -1086,6 +1088,415 @@ with tab6:
     with col2:
         deficit = FUNDRAISING_PIPELINE.get("deficit", {}).get("amount", 0)
         st.metric("Gap to Fill", format_currency(deficit), delta="Unfunded")
+
+
+# =============================================================================
+# TAB 7: INSIGHTS & AUDIT
+# =============================================================================
+with tab7:
+    st.session_state.current_tab = "Insights & Audit"
+    st.header("🔍 Financial Insights & Audit")
+    st.caption("AI-powered analysis of your budget data. All findings based on actual budget figures only.")
+
+    # Financial Health Score
+    col1, col2, col3, col4 = st.columns(4)
+
+    # Calculate health metrics
+    surplus_ratio = PROJECTED_SURPLUS / TOTAL_INFLOWS * 100
+    runway_months = PROJECTED_SURPLUS / (TOTAL_EXPENSES / 12)
+    grant_concentration = max(g["amount"] for g in GRANT_INCOME.values()) / TOTAL_GRANT_INCOME * 100
+
+    with col1:
+        health_score = min(100, int(50 + surplus_ratio + (runway_months * 2) - (grant_concentration / 2)))
+        st.metric("Financial Health", f"{health_score}/100", help="Composite score based on surplus, runway, and diversification")
+
+    with col2:
+        st.metric("Surplus Ratio", f"{surplus_ratio:.1f}%", help="Projected surplus as % of inflows")
+
+    with col3:
+        st.metric("Post-2026 Runway", f"{runway_months:.1f} months", help="How long money lasts after Dec 2026")
+
+    with col4:
+        st.metric("Top Grant Concentration", f"{grant_concentration:.0f}%", delta="High Risk" if grant_concentration > 35 else "OK")
+
+    st.markdown("---")
+
+    # AI COSTS SECTION
+    with st.expander("🤖 **AI & Technology Costs Analysis**", expanded=True):
+        st.markdown("### Annual Technology Subscription Costs")
+
+        # Calculate AI costs
+        ai_tools = SUBSCRIPTIONS.get("ai_tools", {})
+        productivity_tools = SUBSCRIPTIONS.get("productivity", {})
+
+        ai_total = sum(tool.get("annual", 0) for tool in ai_tools.values())
+        productivity_total = sum(tool.get("annual", 0) for tool in productivity_tools.values())
+        total_subscriptions = ai_total + productivity_total
+
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            st.metric("AI Tools", f"${ai_total:,}/year", help="LLMs, coding assistants, image gen")
+        with col2:
+            st.metric("Productivity", f"${productivity_total:,}/year", help="Adobe, Atlassian, etc.")
+        with col3:
+            pct_of_expenses = (total_subscriptions / TOTAL_EXPENSES) * 100
+            st.metric("% of Total Budget", f"{pct_of_expenses:.1f}%")
+
+        # AI costs breakdown chart
+        ai_data = pd.DataFrame([
+            {"Tool": name.replace("_", " ").title(), "Annual Cost": data.get("annual", 0), "Category": "AI"}
+            for name, data in ai_tools.items()
+        ])
+
+        fig = px.bar(
+            ai_data.sort_values("Annual Cost", ascending=True),
+            y="Tool",
+            x="Annual Cost",
+            orientation="h",
+            color="Annual Cost",
+            color_continuous_scale="Reds",
+            text="Annual Cost",
+        )
+        fig.update_layout(height=300, showlegend=False, title="AI Tool Costs (Annual)")
+        fig.update_traces(texttemplate="$%{text:,.0f}", textposition="outside")
+        st.plotly_chart(fig, use_container_width=True)
+
+        # LLM consolidation insight
+        llm_providers = ["anthropic", "openai", "xai", "gemini"]
+        llm_cost = sum(ai_tools.get(p, {}).get("annual", 0) for p in llm_providers)
+
+        st.warning(f"""
+        **⚠️ LLM Provider Consolidation Opportunity**
+
+        You're paying **4 LLM providers** at $800/month each = **${llm_cost:,}/year**
+
+        **Recommendation:** Consolidate to 1-2 providers to save **$19,200-$28,800/year**
+
+        | Current | Recommended | Savings |
+        |---------|-------------|---------|
+        | Anthropic + OpenAI + xAI + Gemini | Anthropic + OpenAI | ~$19,200/yr |
+        | All 4 providers | Single provider | ~$28,800/yr |
+        """)
+
+    # DEPARTMENT BUDGET ANALYSIS
+    with st.expander("🏢 **Department Budget Analysis**", expanded=True):
+        st.markdown("### Where Is the Money Going?")
+
+        # Head Office breakdown
+        head_office_breakdown = pd.DataFrame([
+            {"Category": "Salaries (Dev Teams)", "Amount": EXPENSES["salaries_development_teams"], "% of Total": EXPENSES["salaries_development_teams"]/TOTAL_EXPENSES*100},
+            {"Category": "Non-Salary Expenses", "Amount": EXPENSES["non_salary_expenses"], "% of Total": EXPENSES["non_salary_expenses"]/TOTAL_EXPENSES*100},
+            {"Category": "Product", "Amount": EXPENSES["product"], "% of Total": EXPENSES["product"]/TOTAL_EXPENSES*100},
+            {"Category": "Employee Wellbeing", "Amount": EXPENSES["employee_wellbeing"], "% of Total": EXPENSES["employee_wellbeing"]/TOTAL_EXPENSES*100},
+            {"Category": "Strategy", "Amount": EXPENSES["strategy"], "% of Total": EXPENSES["strategy"]/TOTAL_EXPENSES*100},
+            {"Category": "Subscriptions", "Amount": EXPENSES["subscriptions"], "% of Total": EXPENSES["subscriptions"]/TOTAL_EXPENSES*100},
+            {"Category": "Tax", "Amount": EXPENSES["tax"], "% of Total": EXPENSES["tax"]/TOTAL_EXPENSES*100},
+        ])
+
+        col1, col2 = st.columns([1, 1])
+
+        with col1:
+            st.markdown("**Head Office ($1.69M = 66% of budget)**")
+            fig = px.pie(
+                head_office_breakdown,
+                values="Amount",
+                names="Category",
+                hole=0.4,
+                color_discrete_sequence=px.colors.qualitative.Set3,
+            )
+            fig.update_layout(height=350, margin=dict(t=20, b=20))
+            st.plotly_chart(fig, use_container_width=True)
+
+        with col2:
+            st.markdown("**Program Costs ($874K = 34% of budget)**")
+            program_breakdown = pd.DataFrame([
+                {"Category": "Programme Operations", "Amount": EXPENSES["program_operations"]},
+                {"Category": "NIETE ICT", "Amount": EXPENSES["niete_ict"]},
+                {"Category": "Prevail Rawalpindi", "Amount": EXPENSES["prevail_rawalpindi"]},
+                {"Category": "Data Collection", "Amount": EXPENSES["data_collection"]},
+                {"Category": "Programs Other", "Amount": EXPENSES["programs_other"]},
+            ])
+            fig = px.pie(
+                program_breakdown,
+                values="Amount",
+                names="Category",
+                hole=0.4,
+                color_discrete_sequence=px.colors.qualitative.Pastel,
+            )
+            fig.update_layout(height=350, margin=dict(t=20, b=20))
+            st.plotly_chart(fig, use_container_width=True)
+
+        # Red flags
+        st.error(f"""
+        **🔴 Red Flags Identified**
+
+        1. **Non-Salary Expenses: ${EXPENSES['non_salary_expenses']:,}** (20% of budget)
+           - No itemized breakdown available in budget
+           - **Action:** Request detailed breakdown from finance team
+
+        2. **Programme Operations vs NIETE ICT:**
+           | Program | Cost | Students | Cost/Student |
+           |---------|------|----------|--------------|
+           | Programme Ops | ${EXPENSES['program_operations']:,} | ??? | Unknown |
+           | NIETE ICT | ${EXPENSES['niete_ict']:,} | 90,000 | $4.51 |
+
+           **Issue:** Programme Operations is 2× NIETE ICT cost but student count unknown
+        """)
+
+    # HEADCOUNT EFFICIENCY
+    with st.expander("👥 **Headcount Efficiency Trend**", expanded=False):
+        st.markdown("### Staff Changes: Jan-Jun vs Jul-Dec 2026")
+
+        # Prepare headcount data
+        jan_jun = HEADCOUNT["jan_jun_2026"]["by_department"]
+        jul_dec = HEADCOUNT["jul_dec_2026"]["by_department"]
+
+        dept_names = list(jan_jun.keys())
+        headcount_df = pd.DataFrame({
+            "Department": [d.replace("_", " ").upper() for d in dept_names],
+            "Jan-Jun": [jan_jun[d] for d in dept_names],
+            "Jul-Dec": [jul_dec[d] for d in dept_names],
+        })
+        headcount_df["Change"] = headcount_df["Jul-Dec"] - headcount_df["Jan-Jun"]
+        headcount_df["% Change"] = (headcount_df["Change"] / headcount_df["Jan-Jun"].replace(0, 1) * 100).round(0)
+
+        # Filter to show significant departments
+        significant_depts = headcount_df[headcount_df["Jan-Jun"] >= 5].sort_values("Change")
+
+        fig = go.Figure()
+        fig.add_trace(go.Bar(
+            name="Jan-Jun 2026",
+            y=significant_depts["Department"],
+            x=significant_depts["Jan-Jun"],
+            orientation="h",
+            marker_color="#3B82F6",
+        ))
+        fig.add_trace(go.Bar(
+            name="Jul-Dec 2026",
+            y=significant_depts["Department"],
+            x=significant_depts["Jul-Dec"],
+            orientation="h",
+            marker_color="#10B981",
+        ))
+        fig.update_layout(
+            barmode="group",
+            height=400,
+            title="Headcount by Department",
+            xaxis_title="Staff Count",
+        )
+        st.plotly_chart(fig, use_container_width=True)
+
+        # Summary metrics
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            st.metric("Total Staff (Jan-Jun)", HEADCOUNT["jan_jun_2026"]["total"])
+        with col2:
+            st.metric("Total Staff (Jul-Dec)", HEADCOUNT["jul_dec_2026"]["total"])
+        with col3:
+            reduction = HEADCOUNT["jan_jun_2026"]["total"] - HEADCOUNT["jul_dec_2026"]["total"]
+            st.metric("Reduction", f"-{reduction}", delta=f"-{reduction/HEADCOUNT['jan_jun_2026']['total']*100:.0f}%")
+
+        st.info("""
+        **Key Observations:**
+        - **NIETE ICT:** 71 → 0 (project ends June 2026)
+        - **Digital Learning:** 29 → 15 (48% reduction)
+        - **Engineering:** 32 → 32 (no change) ⚠️
+
+        **Question:** With NIETE ICT ending and DL shrinking, is 32 engineers still justified?
+        """)
+
+    # COST PER CHILD EFFICIENCY
+    with st.expander("💰 **Cost Per Child Efficiency**", expanded=False):
+        st.markdown("### Program Cost Efficiency Comparison")
+
+        efficiency_data = pd.DataFrame([
+            {
+                "Program": "NIETE ICT (Islamabad)",
+                "Students": 90000,
+                "2026 Budget": EXPENSES["niete_ict"],
+                "Cost/Child/Year": UNIT_ECONOMICS["niete_ict"]["cost_per_child"],
+                "Duration": "Apr 2024 - Jun 2026",
+            },
+            {
+                "Program": "Rawalpindi",
+                "Students": 37000,
+                "2026 Budget": EXPENSES["prevail_rawalpindi"],
+                "Cost/Child/Year": UNIT_ECONOMICS["prevail_rawalpindi"]["cost_per_child"],
+                "Duration": "Aug 2025 - Jun 2027",
+            },
+            {
+                "Program": "Programme Operations",
+                "Students": "Unknown",
+                "2026 Budget": EXPENSES["program_operations"],
+                "Cost/Child/Year": "Cannot calculate",
+                "Duration": "Ongoing",
+            },
+        ])
+
+        st.dataframe(efficiency_data, use_container_width=True, hide_index=True)
+
+        col1, col2 = st.columns(2)
+        with col1:
+            # Cost per child comparison chart
+            cost_comparison = pd.DataFrame([
+                {"Program": "Rawalpindi", "Cost/Child/Year": 3.53, "Type": "Most Efficient"},
+                {"Program": "NIETE ICT (Variable)", "Cost/Child/Year": 10.62, "Type": "Standard"},
+                {"Program": "NIETE ICT (Total)", "Cost/Child/Year": 13.46, "Type": "With Fixed"},
+            ])
+            fig = px.bar(
+                cost_comparison,
+                x="Program",
+                y="Cost/Child/Year",
+                color="Type",
+                text="Cost/Child/Year",
+                color_discrete_map={"Most Efficient": "#10B981", "Standard": "#3B82F6", "With Fixed": "#F59E0B"},
+            )
+            fig.update_traces(texttemplate="$%{text:.2f}", textposition="outside")
+            fig.update_layout(height=300, showlegend=True, title="Cost Per Child Per Year")
+            st.plotly_chart(fig, use_container_width=True)
+
+        with col2:
+            st.markdown("**Why the difference?**")
+            st.markdown("""
+            | Factor | NIETE ICT | Rawalpindi |
+            |--------|-----------|------------|
+            | Fixed Costs | $574K (monitoring cell, CPD) | Minimal |
+            | Staff | 71 dedicated staff | 6 staff |
+            | Duration | 27 months | 23 months |
+            | Model | Government contract | Grant-funded |
+
+            **Insight:** Rawalpindi is 3× more cost-efficient because it doesn't carry fixed cost overhead.
+            """)
+
+    # REVENUE CONCENTRATION RISK
+    with st.expander("⚠️ **Revenue Concentration Risk**", expanded=False):
+        st.markdown("### Grant Dependency Analysis")
+
+        # Calculate grant percentages
+        grant_risk_data = []
+        for name, data in GRANT_INCOME.items():
+            pct = data["amount"] / TOTAL_GRANT_INCOME * 100
+            risk = "🔴 Critical" if pct > 30 else ("🟡 Medium" if pct > 15 else "🟢 Low")
+            grant_risk_data.append({
+                "Funder": name.replace("_", " ").title(),
+                "Amount": data["amount"],
+                "% of Total": pct,
+                "Risk Level": risk,
+            })
+
+        risk_df = pd.DataFrame(grant_risk_data).sort_values("Amount", ascending=False)
+
+        col1, col2 = st.columns([1, 1])
+
+        with col1:
+            st.dataframe(risk_df, use_container_width=True, hide_index=True)
+
+        with col2:
+            fig = px.pie(
+                risk_df,
+                values="Amount",
+                names="Funder",
+                color="Risk Level",
+                color_discrete_map={"🔴 Critical": "#EF4444", "🟡 Medium": "#F59E0B", "🟢 Low": "#10B981"},
+                hole=0.4,
+            )
+            fig.update_layout(height=300, title="Grant Portfolio Risk")
+            st.plotly_chart(fig, use_container_width=True)
+
+        # Top 2 concentration
+        top_2_pct = (GRANT_INCOME["mulago"]["amount"] + GRANT_INCOME["prevail_general_ops"]["amount"] + GRANT_INCOME["prevail_implementation"]["amount"] + GRANT_INCOME["prevail_data_collection"]["amount"]) / TOTAL_GRANT_INCOME * 100
+
+        st.error(f"""
+        **🚨 High Concentration Risk**
+
+        **{top_2_pct:.0f}% of grants from just 2 funders (Mulago + Prevail)**
+
+        | Scenario | Impact |
+        |----------|--------|
+        | Lose Mulago ($950K) | Surplus drops to $315K, runway to 1.5 months |
+        | Lose Prevail ($950K) | Surplus drops to $315K, runway to 1.5 months |
+        | Lose both | **Deficit of $635K** |
+
+        **Recommendation:** Diversify funding sources. Target no single funder >25% of total.
+        """)
+
+    # RECOMMENDATIONS SUMMARY
+    st.markdown("---")
+    st.subheader("📋 Recommendations Summary")
+
+    rec_col1, rec_col2 = st.columns(2)
+
+    with rec_col1:
+        st.markdown("""
+        **🔴 High Priority (Do Now)**
+
+        1. **Consolidate LLM providers** (4→2)
+           - Potential savings: $19-29K/year
+           - Action: Choose Anthropic + OpenAI
+
+        2. **Get Programme Ops student count**
+           - Cannot calculate cost efficiency without it
+           - Action: Request from programs team
+
+        3. **Itemize Non-Salary Expenses**
+           - $499K with no breakdown
+           - Action: Request detailed list from finance
+        """)
+
+    with rec_col2:
+        st.markdown("""
+        **🟡 Medium Priority (This Quarter)**
+
+        4. **Review Engineering headcount post-June**
+           - NIETE ICT ends, DL shrinks 48%
+           - Engineering stays at 32 - is this justified?
+
+        5. **Diversify grant portfolio**
+           - 82% from 2 funders is risky
+           - Target: No funder >25% of total
+
+        6. **Replit subscription review**
+           - $2,300/month seems high
+           - Potential savings: $15-20K/year
+        """)
+
+    # Download audit report
+    st.markdown("---")
+    audit_summary = f"""
+# Taleemabad Financial Audit Report
+Generated: {datetime.now().strftime('%Y-%m-%d %H:%M')}
+
+## Key Metrics
+- Financial Health Score: {health_score}/100
+- Surplus Ratio: {surplus_ratio:.1f}%
+- Post-2026 Runway: {runway_months:.1f} months
+- Top Grant Concentration: {grant_concentration:.0f}%
+
+## AI Costs
+- Total AI Tools: ${ai_total:,}/year
+- LLM Providers: ${llm_cost:,}/year (4 providers)
+- Potential Savings: $19,200-$28,800/year
+
+## Red Flags
+1. Non-Salary Expenses: ${EXPENSES['non_salary_expenses']:,} (no itemization)
+2. Programme Operations: ${EXPENSES['program_operations']:,} (student count unknown)
+3. Grant Concentration: {top_2_pct:.0f}% from 2 funders
+
+## Recommendations
+1. Consolidate LLM providers (save $19-29K/year)
+2. Get Programme Ops student count
+3. Itemize Non-Salary Expenses
+4. Review Engineering headcount post-June
+5. Diversify grant portfolio (<25% per funder)
+"""
+
+    st.download_button(
+        label="📥 Download Audit Report (TXT)",
+        data=audit_summary,
+        file_name=f"taleemabad_audit_{datetime.now().strftime('%Y%m%d')}.txt",
+        mime="text/plain",
+        use_container_width=True,
+    )
 
 
 # Footer

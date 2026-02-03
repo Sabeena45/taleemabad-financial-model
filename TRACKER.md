@@ -6,8 +6,8 @@
 
 ## Google Sheet Connection
 
-**Live Sheet:** [Portfolio Wins Tracker](https://docs.google.com/spreadsheets/d/1b402t3-kQZ6-Q8I_golavF0uD9ld29F9/edit)
-**Spreadsheet ID:** `1b402t3-kQZ6-Q8I_golavF0uD9ld29F9`
+**Live Sheet:** [Portfolio Wins Tracker](https://docs.google.com/spreadsheets/d/1CC9cW8TLAgC47sUidrzuQDv67GsuAMCCumT6vrpIr-c/edit)
+**Spreadsheet ID:** `1CC9cW8TLAgC47sUidrzuQDv67GsuAMCCumT6vrpIr-c`
 **MCP Access:** Configured in `.mcp.json` → `google-sheets` server
 
 ---

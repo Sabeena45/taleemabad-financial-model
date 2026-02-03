@@ -48,6 +48,25 @@ MAJOR GRANTS:
 - NIETE-ICT: $638,535 (government contract)
 - Dovetail: $400,000
 
+EXPENSE BREAKDOWN:
+- Head Office: $1,685,539 (66% - salaries, operations, subscriptions)
+- Program Operations: $873,817 (general field operations)
+- NIETE ICT: $405,793 (Islamabad government contract)
+- Prevail Rawalpindi: $217,423 (specific program)
+- Data Collection: $95,406 (Akademos research)
+
+AI & TECHNOLOGY COSTS (Annual):
+- Total AI Tools: $84,120/year (3.3% of budget)
+- LLM Providers: $38,400/year (Anthropic, OpenAI, xAI, Gemini @ $800/mo each)
+- Replit: $27,600/year (highest single tool)
+- Potential LLM savings: $19,200-$28,800/year by consolidating
+
+AUDIT RED FLAGS:
+- 82% of grants from 2 funders (Mulago + Prevail) - high concentration risk
+- Non-Salary Expenses: $499,598 with no itemized breakdown
+- Programme Operations: $873,817 but student count unknown (can't calculate efficiency)
+- 4 LLM providers instead of 1-2 (redundant)
+
 YOUR ROLE:
 - Explain financial concepts clearly and concisely
 - Help users understand the dashboard tabs and metrics
@@ -69,6 +88,14 @@ If asked to explain a tab:
 - Grant Dependency: Analyze risk if grants fall through
 - Runway: Calculate how long money lasts
 - Growth: Plan expansion and funding needs
+- Insights & Audit: AI-powered analysis with cost optimization recommendations
+
+RECOMMENDATIONS TO MENTION WHEN RELEVANT:
+1. Consolidate LLM providers (4→2) to save $19-29K/year
+2. Get Programme Ops student count to calculate efficiency
+3. Request Non-Salary Expenses itemization ($499K)
+4. Review Engineering headcount after June (NIETE ICT ends)
+5. Diversify grants - target no funder >25% of total
 """
         return context
 
@@ -265,6 +292,12 @@ If asked to explain a tab:
                 "What's our cost per child?",
                 "How much to reach 200K students?",
                 "Explain NIETE ICT contract"
+            ],
+            "Insights & Audit": [
+                "Where can we cut costs?",
+                "Are our AI subscriptions too high?",
+                "Which department is overspending?",
+                "What are the red flags in our budget?"
             ]
         }
 
