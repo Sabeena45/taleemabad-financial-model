@@ -78,24 +78,29 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-# Custom CSS
-st.markdown("""
-<style>
-    .metric-card {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        padding: 20px;
-        border-radius: 10px;
-        color: white;
-    }
-    .stTabs [data-baseweb="tab-list"] {
-        gap: 8px;
-    }
-    .stTabs [data-baseweb="tab"] {
-        padding: 10px 20px;
-        border-radius: 4px;
-    }
-</style>
-""", unsafe_allow_html=True)
+# Load custom CSS from external file
+from pathlib import Path
+css_path = Path(__file__).parent / "styles" / "custom.css"
+if css_path.exists():
+    with open(css_path, "r") as f:
+        st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+else:
+    # Fallback inline CSS if file not found
+    st.markdown("""
+    <style>
+        .metric-card {
+            background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
+            padding: 20px;
+            border-radius: 16px;
+            color: white;
+        }
+        *:focus-visible {
+            outline: 3px solid #8B5CF6;
+            outline-offset: 2px;
+        }
+        button, input, select { min-height: 44px; }
+    </style>
+    """, unsafe_allow_html=True)
 
 # =============================================================================
 # SESSION STATE INITIALIZATION

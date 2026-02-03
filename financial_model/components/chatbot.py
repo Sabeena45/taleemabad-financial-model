@@ -119,15 +119,26 @@ If asked to explain a tab:
         dashboard_data: Dict
     ):
         """
-        Render the chat interface in Streamlit sidebar.
+        Render the chat interface in Streamlit sidebar with enhanced accessibility.
+        Uses custom CSS classes from the design system for consistent styling.
         """
         st.sidebar.markdown("---")
-        st.sidebar.subheader("💬 Ask the AI Assistant")
+
+        # Accessible header with ARIA
+        st.sidebar.markdown("""
+            <h3 id="chat-heading" style="margin-bottom: 1rem;">
+                💬 Ask the AI Assistant
+            </h3>
+        """, unsafe_allow_html=True)
 
         # Check if API key is available
         if not self.client:
-            st.sidebar.warning("⚠️ Chatbot disabled: Add ANTHROPIC_API_KEY to Railway")
-            st.sidebar.caption("Set environment variable in Railway dashboard")
+            st.sidebar.markdown("""
+                <div role="alert" aria-live="polite" class="chat-message" style="background: #FEF3C7; border-left: 4px solid #F59E0B; padding: 0.75rem;">
+                    <strong>⚠️ Chatbot disabled</strong><br>
+                    <span style="font-size: 0.85rem;">Add ANTHROPIC_API_KEY to Railway environment variables</span>
+                </div>
+            """, unsafe_allow_html=True)
             return
 
         # Initialize chat history in session state
@@ -160,21 +171,42 @@ If asked to explain a tab:
                     })
                     st.rerun()
 
-        # Chat history display
+        # Chat history display with accessibility
         if st.session_state.chat_history:
+            # Create accessible chat container
+            st.sidebar.markdown("""
+                <div class="chat-container" role="log" aria-label="Chat conversation" aria-live="polite" aria-relevant="additions">
+            """, unsafe_allow_html=True)
+
             chat_container = st.sidebar.container(height=400)
             with chat_container:
-                for msg in st.session_state.chat_history[-6:]:  # Show last 6 messages
-                    with st.chat_message(msg["role"]):
-                        st.write(msg["content"])
+                for idx, msg in enumerate(st.session_state.chat_history[-6:]):  # Show last 6 messages
+                    role = msg["role"]
+                    content = msg["content"]
 
-            # Clear chat button
-            if st.sidebar.button("🗑️ Clear Chat", use_container_width=True):
+                    # Use custom styled messages with ARIA
+                    if role == "user":
+                        st.sidebar.markdown(f"""
+                            <div class="chat-message chat-message-user" role="listitem" aria-label="You said">
+                                {content}
+                            </div>
+                        """, unsafe_allow_html=True)
+                    else:
+                        st.sidebar.markdown(f"""
+                            <div class="chat-message chat-message-assistant" role="listitem" aria-label="Assistant replied">
+                                {content}
+                            </div>
+                        """, unsafe_allow_html=True)
+
+            st.sidebar.markdown("</div>", unsafe_allow_html=True)
+
+            # Clear chat button with accessibility
+            if st.sidebar.button("🗑️ Clear Chat", use_container_width=True, help="Clear all chat messages"):
                 st.session_state.chat_history = []
                 st.rerun()
 
-        # Chat input
-        user_input = st.sidebar.chat_input("Ask a question...")
+        # Chat input with accessibility label
+        user_input = st.sidebar.chat_input("Ask a question...", key="chat_input")
 
         if user_input:
             # Add user message
