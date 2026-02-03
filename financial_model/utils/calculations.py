@@ -181,14 +181,14 @@ def simulate_grant_removal(grant_to_remove: str) -> Dict[str, float]:
 
 def calculate_growth_funding_gap(
     target_students: int,
-    cost_per_student: float = 4.4,  # Using NIETE ICT rate as default
+    cost_per_student: float = 23.90,  # NIETE ICT variable cost; Rawalpindi is $6.76
 ) -> Dict[str, float]:
     """
     Calculate funding gap for student growth targets.
 
     Args:
         target_students: Target number of students
-        cost_per_student: Cost per student per year (default: $4.4 from NIETE ICT)
+        cost_per_student: Cost per student (default: $23.90 NIETE ICT variable cost, Rawalpindi: $6.76)
 
     Returns:
         Dict with funding gap analysis

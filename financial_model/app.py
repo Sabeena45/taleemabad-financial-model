@@ -38,6 +38,7 @@ from data.budget_2026 import (
     PARTNER_REVENUE,
     HEADCOUNT,
     UNIT_ECONOMICS,
+    NIETE_ICT_CONTRACT,
     FUNDRAISING_PIPELINE,
     FUNDRAISING_TARGET,
     BANK_BALANCES,
@@ -881,7 +882,46 @@ with tab6:
             UNIT_ECONOMICS["niete_ict"]["students"] * UNIT_ECONOMICS["niete_ict"]["cost_per_child"] +
             UNIT_ECONOMICS["prevail_rawalpindi"]["students"] * UNIT_ECONOMICS["prevail_rawalpindi"]["cost_per_child"]
         ) / current_students
-        st.metric("Avg Cost/Student", f"${avg_cost:.2f}")
+        st.metric("Avg Cost/Student (Variable)", f"${avg_cost:.2f}")
+
+    st.markdown("---")
+
+    # NIETE ICT Contract Breakdown
+    st.subheader("📊 NIETE ICT Contract Breakdown (Islamabad)")
+    st.caption(f"Duration: {NIETE_ICT_CONTRACT['start_date']} - {NIETE_ICT_CONTRACT['end_date']} ({NIETE_ICT_CONTRACT['duration_months']} months)")
+
+    breakdown_col1, breakdown_col2 = st.columns(2)
+
+    with breakdown_col1:
+        st.markdown("**Fixed Costs (One-time)**")
+        fixed_costs = pd.DataFrame([
+            {"Component": "Research/TNA Primary", "PKR": "6,210,000", "USD": "$21,943"},
+            {"Component": "Virtual CPD Certification (L1-L3)", "PKR": "37,260,000", "USD": "$131,661"},
+            {"Component": "Research/TNA Induction Primary", "PKR": "6,210,000", "USD": "$21,943"},
+            {"Component": "Virtual Induction Certification", "PKR": "24,840,000", "USD": "$87,774"},
+            {"Component": "Establishment of Monitoring Cell", "PKR": "88,023,852", "USD": "$311,039"},
+            {"Component": "**Subtotal Fixed**", "PKR": "**162,543,852**", "USD": "**$574,360**"},
+        ])
+        st.dataframe(fixed_costs, hide_index=True, use_container_width=True)
+
+    with breakdown_col2:
+        st.markdown("**Variable Costs (Per-child related)**")
+        variable_costs = pd.DataFrame([
+            {"Component": "Operational Cost Monitoring (24m)", "PKR": "214,624,754", "USD": "$758,392"},
+            {"Component": "Outsourced Recruitment (24m)", "PKR": "314,795,250", "USD": "$1,112,349"},
+            {"Component": "Management Fee (15%)", "PKR": "79,413,001", "USD": "$280,611"},
+            {"Component": "**Subtotal Variable**", "PKR": "**608,833,005**", "USD": "**$2,151,352**"},
+        ])
+        st.dataframe(variable_costs, hide_index=True, use_container_width=True)
+
+    # Total contract summary
+    total_col1, total_col2, total_col3 = st.columns(3)
+    with total_col1:
+        st.metric("Total Contract", f"${NIETE_ICT_CONTRACT['total_usd']:,}", help="771,376,857 PKR")
+    with total_col2:
+        st.metric("Cost/Child (Variable)", f"${UNIT_ECONOMICS['niete_ict']['cost_per_child']:.2f}", help="Variable costs ÷ 90,000 students")
+    with total_col3:
+        st.metric("Cost/Child (Total)", f"${UNIT_ECONOMICS['niete_ict']['cost_per_child_total']:.2f}", help="Total contract ÷ 90,000 students")
 
     st.markdown("---")
 
@@ -901,9 +941,9 @@ with tab6:
 
         cost_per_student = st.select_slider(
             "Cost per Student",
-            options=[4.4, 5.0, 6.0, 7.0, 8.0, 9.9, 10.0, 12.0],
-            value=4.4,
-            help="NIETE ICT: $4.4, Rawalpindi: $9.9"
+            options=[6.76, 10.0, 15.0, 20.0, 23.90, 25.0, 30.29, 35.0, 40.0],
+            value=23.90,
+            help="Rawalpindi: $6.76/child | NIETE ICT: $23.90/child (variable) or $30.29/child (total)"
         )
 
         additional_students = target_students - current_students
@@ -916,8 +956,9 @@ with tab6:
         st.subheader("Cost Comparison")
 
         cost_comparison = pd.DataFrame([
-            {"Program": "NIETE ICT", "Cost/Student": 4.4, "Students": 92000},
-            {"Program": "Rawalpindi", "Cost/Student": 9.9, "Students": 22000},
+            {"Program": "NIETE ICT (Variable)", "Cost/Student": 23.90, "Students": 90000, "Contract": "$2.15M", "Duration": "Apr 2024 - Jun 2026"},
+            {"Program": "NIETE ICT (Total)", "Cost/Student": 30.29, "Students": 90000, "Contract": "$2.73M", "Duration": "Apr 2024 - Jun 2026"},
+            {"Program": "Rawalpindi", "Cost/Student": 6.76, "Students": 37000, "Contract": "$250K", "Duration": "Aug 2025 - Jun 2027"},
         ])
 
         fig = px.bar(
@@ -927,9 +968,12 @@ with tab6:
             color="Program",
             text="Cost/Student",
         )
-        fig.update_layout(height=300, showlegend=False)
+        fig.update_layout(height=350, showlegend=False)
         fig.update_traces(texttemplate="$%{text:.1f}", textposition="outside")
         st.plotly_chart(fig, use_container_width=True)
+
+        st.caption("**Variable costs** = operational + recruitment + management fee (per-child related)")
+        st.caption("**Total costs** = variable + fixed (research, CPD, establishment)")
 
     # Partner revenue projections
     st.subheader("Partner Revenue Projections")

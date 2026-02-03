@@ -254,15 +254,68 @@ HEADCOUNT = {
     },
 }
 
-# Unit economics (Page 3)
+# NIETE ICT Contract Breakdown (Islamabad)
+# Full contract breakdown in PKR (inclusive of tax)
+NIETE_ICT_CONTRACT = {
+    "location": "Islamabad",
+    "students": 90000,
+    "start_date": "Apr 2024",
+    "end_date": "Jun 2026",
+    "duration_months": 27,
+    "total_pkr": 771376857,
+    "total_usd": 2726287,  # At 283 PKR/USD
+    "breakdown_pkr": {
+        # Fixed costs
+        "research_tna_primary": 6210000,
+        "virtual_cpd_certification_l1_l3": 37260000,
+        "research_tna_induction_primary": 6210000,
+        "virtual_induction_certification_primary": 24840000,
+        "establishment_monitoring_cell_primary": 88023852,
+        # Variable costs
+        "operational_cost_monitoring_cell_24m": 214624754,
+        "outsourced_recruitment_24m": 314795250,
+        "outcome_based_management_fee_15pct": 79413001,  # 5% automatic + 10% outcome = 15%
+    },
+    "breakdown_usd": {
+        # Fixed costs (at 283 PKR/USD)
+        "research_tna_primary": 21943,
+        "virtual_cpd_certification_l1_l3": 131661,
+        "research_tna_induction_primary": 21943,
+        "virtual_induction_certification_primary": 87774,
+        "establishment_monitoring_cell_primary": 311039,
+        # Variable costs
+        "operational_cost_monitoring_cell_24m": 758392,
+        "outsourced_recruitment_24m": 1112349,
+        "outcome_based_management_fee_15pct": 280611,
+    },
+    "fixed_costs_usd": 574360,  # Sum of fixed costs
+    "variable_costs_usd": 2151352,  # Sum of variable costs (for cost per child calc)
+}
+
+# Unit economics - Updated with variable costs for cost per child
+# NIETE ICT (Islamabad): Apr 2024 - Jun 2026 (27 months) - uses variable costs
+# Prevail Rawalpindi: Aug 2025 - Jun 2027 (23 months)
 UNIT_ECONOMICS = {
     "niete_ict": {
-        "students": 92000,
-        "cost_per_child": 4.4,  # USD
+        "students": 90000,
+        "total_contract_usd": 2726287,  # 771,376,857 PKR at 283
+        "fixed_costs_usd": 574360,
+        "variable_costs_usd": 2151352,
+        "cost_per_child": 23.90,  # USD (variable costs / students)
+        "cost_per_child_total": 30.29,  # USD (total contract / students)
+        "start_date": "Apr 2024",
+        "end_date": "Jun 2026",
+        "duration_months": 27,
+        "location": "Islamabad",
     },
     "prevail_rawalpindi": {
-        "students": 22000,
-        "cost_per_child": 9.9,  # USD
+        "students": 37000,
+        "total_contract_usd": 250000,
+        "cost_per_child": 6.76,  # USD (total contract / students)
+        "start_date": "Aug 2025",
+        "end_date": "Jun 2027",
+        "duration_months": 23,
+        "location": "Rawalpindi",
     },
 }
 
