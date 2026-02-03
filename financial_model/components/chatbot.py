@@ -102,7 +102,7 @@ If asked to explain a tab:
         try:
             # Call Claude API
             response = self.client.messages.create(
-                model="claude-3-5-sonnet-20241022",
+                model="claude-sonnet-4-20250514",
                 max_tokens=1024,
                 system=self.get_system_context(current_tab, dashboard_data),
                 messages=messages
