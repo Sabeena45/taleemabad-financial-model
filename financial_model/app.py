@@ -48,6 +48,13 @@ from models.cashflow_model import CashFlowModel
 from models.scenario_model import ScenarioModel, ScenarioType
 from models.sensitivity_model import SensitivityModel
 
+# Try to import chatbot (graceful fallback if not available)
+try:
+    from components.chatbot import FinancialChatbot
+    CHATBOT_AVAILABLE = True
+except ImportError:
+    CHATBOT_AVAILABLE = False
+
 # Try to import export functions (graceful fallback if not available)
 try:
     from exports.excel_export import export_to_excel
@@ -266,6 +273,34 @@ with st.sidebar:
                         st.error(f"Sync failed: {e}")
 
 
+# =============================================================================
+# AI CHATBOT ASSISTANT
+# =============================================================================
+if CHATBOT_AVAILABLE:
+    # Initialize chatbot
+    chatbot = FinancialChatbot()
+
+    # Prepare dashboard context data
+    model = CashFlowModel()
+    dashboard_data = {
+        'opening_balance': OPENING_BALANCE,
+        'projected_surplus': PROJECTED_SURPLUS,
+        'total_grants': TOTAL_GRANT_INCOME,
+        'avg_burn': model.get_average_monthly_burn(),
+        'runway_months': model.get_year_end_position() / model.get_average_monthly_burn(),
+    }
+
+    # Track current tab (initialize in session state)
+    if 'current_tab' not in st.session_state:
+        st.session_state.current_tab = "Executive Summary"
+
+    # Render chatbot in sidebar
+    chatbot.render_chat_widget(
+        current_tab=st.session_state.current_tab,
+        dashboard_data=dashboard_data
+    )
+
+
 # Main content with tabs
 tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
     "📊 Executive Summary",
@@ -281,6 +316,7 @@ tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
 # TAB 1: EXECUTIVE SUMMARY
 # =============================================================================
 with tab1:
+    st.session_state.current_tab = "Executive Summary"
     st.header("Executive Summary - 2026 Budget")
 
     # Key metrics row
@@ -399,6 +435,7 @@ with tab1:
 # TAB 2: CASH FLOW FORECASTING
 # =============================================================================
 with tab2:
+    st.session_state.current_tab = "Cash Flow Forecasting"
     st.header("Cash Flow Forecasting")
 
     model = CashFlowModel()
@@ -476,6 +513,7 @@ with tab2:
 # TAB 3: SCENARIO ANALYSIS
 # =============================================================================
 with tab3:
+    st.session_state.current_tab = "Scenario Analysis"
     st.header("Scenario Analysis")
 
     scenario_model = ScenarioModel()
@@ -657,6 +695,7 @@ with tab3:
 # TAB 4: GRANT DEPENDENCY ANALYSIS
 # =============================================================================
 with tab4:
+    st.session_state.current_tab = "Grant Dependency Analysis"
     st.header("Grant Dependency Analysis")
 
     sensitivity_model = SensitivityModel()
@@ -759,6 +798,7 @@ with tab4:
 # TAB 5: RUNWAY CALCULATOR
 # =============================================================================
 with tab5:
+    st.session_state.current_tab = "Runway Calculator"
     st.header("Runway Calculator")
 
     model = CashFlowModel()
@@ -863,6 +903,7 @@ with tab5:
 # TAB 6: GROWTH SCENARIOS
 # =============================================================================
 with tab6:
+    st.session_state.current_tab = "Growth Scenarios"
     st.header("Growth Scenarios")
 
     # Current scale

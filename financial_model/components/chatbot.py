@@ -1,0 +1,243 @@
+"""
+AI Chatbot Component for Financial Dashboard
+Provides intelligent, context-aware assistance using Claude API.
+"""
+
+import streamlit as st
+import anthropic
+import os
+from typing import List, Dict, Optional
+from datetime import datetime
+
+
+class FinancialChatbot:
+    """
+    AI-powered chatbot that helps users understand the financial dashboard.
+    Context-aware: knows which tab the user is on and their current data.
+    """
+
+    def __init__(self, api_key: Optional[str] = None):
+        """Initialize chatbot with Claude API."""
+        self.api_key = api_key or os.environ.get("ANTHROPIC_API_KEY")
+        if self.api_key:
+            self.client = anthropic.Anthropic(api_key=self.api_key)
+        else:
+            self.client = None
+
+    def get_system_context(self, current_tab: str, dashboard_data: Dict) -> str:
+        """
+        Build context about the dashboard state for Claude.
+        """
+        context = f"""You are a helpful financial analyst assistant embedded in Taleemabad's Financial Dashboard.
+
+CURRENT CONTEXT:
+- User is viewing: {current_tab}
+- Opening Balance: ${dashboard_data.get('opening_balance', 0):,.0f}
+- Year-End Projected Surplus: ${dashboard_data.get('projected_surplus', 0):,.0f}
+- Total Grants 2026: ${dashboard_data.get('total_grants', 0):,.0f}
+- Average Monthly Burn: ${dashboard_data.get('avg_burn', 0):,.0f}
+- Current Runway: {dashboard_data.get('runway_months', 0):.1f} months
+
+KEY PROGRAMS:
+- NIETE ICT (Islamabad): 90,000 students, $10.62/child/year (variable), $13.46/child/year (total)
+- Rawalpindi: 37,000 students, $3.53/child/year
+
+MAJOR GRANTS:
+- Mulago: $950,000 (41% of total)
+- Prevail: $950,000 (41% of total)
+- NIETE-ICT: $638,535 (government contract)
+- Dovetail: $400,000
+
+YOUR ROLE:
+- Explain financial concepts clearly and concisely
+- Help users understand the dashboard tabs and metrics
+- Answer "what-if" questions based on the data
+- Suggest which tab to visit for specific questions
+- Use real numbers from the context above
+
+STYLE:
+- Be conversational but professional
+- Use examples from Taleemabad's actual data
+- Keep responses under 200 words unless asked for detail
+- Use bullet points for clarity
+- Format numbers with $ and commas
+
+If asked to explain a tab:
+- Executive Summary: Overview of 2026 budget health
+- Cash Flow: Month-by-month inflows/outflows
+- Scenarios: Stress-test the budget (optimistic/pessimistic)
+- Grant Dependency: Analyze risk if grants fall through
+- Runway: Calculate how long money lasts
+- Growth: Plan expansion and funding needs
+"""
+        return context
+
+    def generate_response(
+        self,
+        user_message: str,
+        chat_history: List[Dict],
+        current_tab: str,
+        dashboard_data: Dict
+    ) -> str:
+        """
+        Generate AI response using Claude API.
+        """
+        if not self.client:
+            return "⚠️ Chatbot unavailable: ANTHROPIC_API_KEY not set. Please add it to Railway environment variables."
+
+        # Build message history for Claude
+        messages = []
+        for msg in chat_history[-10:]:  # Keep last 10 messages for context
+            messages.append({
+                "role": msg["role"],
+                "content": msg["content"]
+            })
+
+        # Add current user message
+        messages.append({
+            "role": "user",
+            "content": user_message
+        })
+
+        try:
+            # Call Claude API
+            response = self.client.messages.create(
+                model="claude-3-5-sonnet-20241022",
+                max_tokens=1024,
+                system=self.get_system_context(current_tab, dashboard_data),
+                messages=messages
+            )
+
+            return response.content[0].text
+
+        except Exception as e:
+            return f"⚠️ Error: {str(e)}"
+
+    def render_chat_widget(
+        self,
+        current_tab: str,
+        dashboard_data: Dict
+    ):
+        """
+        Render the chat interface in Streamlit sidebar.
+        """
+        st.sidebar.markdown("---")
+        st.sidebar.subheader("💬 Ask the AI Assistant")
+
+        # Check if API key is available
+        if not self.client:
+            st.sidebar.warning("⚠️ Chatbot disabled: Add ANTHROPIC_API_KEY to Railway")
+            st.sidebar.caption("Set environment variable in Railway dashboard")
+            return
+
+        # Initialize chat history in session state
+        if "chat_history" not in st.session_state:
+            st.session_state.chat_history = []
+
+        # Suggested questions based on current tab
+        suggestions = self._get_suggested_questions(current_tab)
+
+        with st.sidebar.expander("💡 Suggested Questions", expanded=False):
+            for suggestion in suggestions:
+                if st.button(suggestion, key=f"suggest_{hash(suggestion)}", use_container_width=True):
+                    # Add suggestion to chat
+                    st.session_state.chat_history.append({
+                        "role": "user",
+                        "content": suggestion,
+                        "timestamp": datetime.now()
+                    })
+                    # Generate response
+                    response = self.generate_response(
+                        suggestion,
+                        st.session_state.chat_history[:-1],
+                        current_tab,
+                        dashboard_data
+                    )
+                    st.session_state.chat_history.append({
+                        "role": "assistant",
+                        "content": response,
+                        "timestamp": datetime.now()
+                    })
+                    st.rerun()
+
+        # Chat history display
+        if st.session_state.chat_history:
+            chat_container = st.sidebar.container(height=400)
+            with chat_container:
+                for msg in st.session_state.chat_history[-6:]:  # Show last 6 messages
+                    with st.chat_message(msg["role"]):
+                        st.write(msg["content"])
+
+            # Clear chat button
+            if st.sidebar.button("🗑️ Clear Chat", use_container_width=True):
+                st.session_state.chat_history = []
+                st.rerun()
+
+        # Chat input
+        user_input = st.sidebar.chat_input("Ask a question...")
+
+        if user_input:
+            # Add user message
+            st.session_state.chat_history.append({
+                "role": "user",
+                "content": user_input,
+                "timestamp": datetime.now()
+            })
+
+            # Generate AI response
+            response = self.generate_response(
+                user_input,
+                st.session_state.chat_history[:-1],
+                current_tab,
+                dashboard_data
+            )
+
+            # Add assistant response
+            st.session_state.chat_history.append({
+                "role": "assistant",
+                "content": response,
+                "timestamp": datetime.now()
+            })
+
+            st.rerun()
+
+    def _get_suggested_questions(self, current_tab: str) -> List[str]:
+        """Get suggested questions based on current tab."""
+        suggestions = {
+            "Executive Summary": [
+                "What's our financial health for 2026?",
+                "Explain the key metrics",
+                "How much money do we have?"
+            ],
+            "Cash Flow Forecasting": [
+                "When do we receive grants?",
+                "Which months are tight?",
+                "Explain cash flow basics"
+            ],
+            "Scenario Analysis": [
+                "What's the worst case scenario?",
+                "How do I stress-test the budget?",
+                "What if revenue drops 20%?"
+            ],
+            "Grant Dependency Analysis": [
+                "What if we lose Mulago?",
+                "Are we too dependent on one grant?",
+                "Which grants are critical?"
+            ],
+            "Runway Calculator": [
+                "How long can we survive?",
+                "Explain runway calculation",
+                "What's our burn rate?"
+            ],
+            "Growth Scenarios": [
+                "What's our cost per child?",
+                "How much to reach 200K students?",
+                "Explain NIETE ICT contract"
+            ]
+        }
+
+        return suggestions.get(current_tab, [
+            "What can this dashboard do?",
+            "Explain the budget overview",
+            "Where should I start?"
+        ])
