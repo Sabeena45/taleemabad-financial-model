@@ -500,7 +500,8 @@ with tab2:
         st.plotly_chart(fig, use_container_width=True)
 
         # Monthly details table
-        with st.expander("📋 Monthly Details Table"):
+        show_cf_details = st.checkbox("📋 Show Monthly Details Table", key="show_cf_details")
+        if show_cf_details:
             df_display = df_positions.copy()
             df_display["Closing"] = cumulative[1:]
             for col in ["Opening", "Inflows", "Outflows", "Closing"]:
@@ -522,7 +523,7 @@ with tab2:
 
         with col1:
             st.markdown("##### Custom Scenario")
-            revenue_mult = st.slider("Revenue Multiplier", 0.5, 1.5, 1.0, 0.05, format="%.0f%%", help="Adjust total revenue (1.0 = 100%)")
+            revenue_mult = st.slider("Revenue Multiplier", 0.5, 1.5, 1.0, 0.05, format="%.2f", help="Adjust total revenue (1.0 = 100%)")
             expense_mult = st.slider("Expense Multiplier", 0.5, 1.5, 1.0, 0.05, help="Adjust total expenses")
             grant_prob = st.slider("Grant Probability", 0.0, 1.0, 1.0, 0.1, help="Probability of grants coming through")
 
@@ -562,7 +563,8 @@ with tab2:
             st.plotly_chart(fig, use_container_width=True)
 
         # Scenario details and saved scenarios
-        with st.expander("📊 Scenario Details Table"):
+        show_scenario_details = st.checkbox("📊 Show Scenario Details Table", key="show_scenario_details")
+        if show_scenario_details:
             df_scenarios = pd.DataFrame(scenario_model.to_comparison_dataframe_dict())
             for col in ["Total Inflows", "Total Expenses", "Year-End Surplus", "Minimum Cash"]:
                 df_scenarios[col] = df_scenarios[col].apply(lambda x: f"${x:,.0f}")
@@ -571,7 +573,8 @@ with tab2:
         if st.session_state.saved_scenarios:
             st.markdown("##### 📋 Saved Scenarios")
             for i, scenario in enumerate(st.session_state.saved_scenarios):
-                with st.expander(f"**{scenario['name']}** - {scenario['timestamp'][:10]}"):
+                show_saved = st.checkbox(f"**{scenario['name']}** - {scenario['timestamp'][:10]}", key=f"show_saved_{i}")
+                if show_saved:
                     c1, c2, c3, c4 = st.columns(4)
                     with c1:
                         st.metric("Surplus", format_currency(scenario['results']['surplus']))
@@ -678,7 +681,8 @@ with tab3:
         st.metric("Average Cost/Student/Year", f"${avg_cost:.2f}")
 
         # NIETE ICT Contract Breakdown (collapsible)
-        with st.expander("📊 NIETE ICT Contract Breakdown (Islamabad)"):
+        show_niete = st.checkbox("📊 Show NIETE ICT Contract Breakdown (Islamabad)", key="show_niete")
+        if show_niete:
             st.caption(f"Duration: {NIETE_ICT_CONTRACT['start_date']} - {NIETE_ICT_CONTRACT['end_date']} ({NIETE_ICT_CONTRACT['duration_months']} months)")
 
             bc1, bc2 = st.columns(2)
@@ -740,7 +744,8 @@ with tab3:
             st.plotly_chart(fig, use_container_width=True)
 
         # Partner Revenue Projections (collapsible)
-        with st.expander("📊 Partner Revenue Projections"):
+        show_partners = st.checkbox("📊 Show Partner Revenue Projections", key="show_partners")
+        if show_partners:
             partner_data = [{"Partner": name.replace("_", " ").title(), "Monthly": data["monthly_usd"], "Annual": data["annual_total"], "Start": data["start_month"], "Schools": data["schools"]} for name, data in PARTNER_REVENUE.items() if data["monthly_usd"] > 0]
             df_partners = pd.DataFrame(partner_data)
             fig = px.bar(df_partners, x="Partner", y="Annual", color="Start", text="Annual", labels={"Annual": "Annual Revenue (USD)"})
@@ -749,7 +754,8 @@ with tab3:
             st.plotly_chart(fig, use_container_width=True)
 
         # Fundraising pipeline (collapsible)
-        with st.expander("🎯 Fundraising Pipeline"):
+        show_pipeline = st.checkbox("🎯 Show Fundraising Pipeline", key="show_pipeline")
+        if show_pipeline:
             pipeline_data = [{"Funder": funder.replace("_", " ").title(), "Amount": data["amount"], "Type": data["type"], "Timing": data.get("timing", "TBD")} for funder, data in FUNDRAISING_PIPELINE.items() if data["amount"] > 0 and funder != "deficit"]
             df_pipeline = pd.DataFrame(pipeline_data)
             fig = px.bar(df_pipeline, y="Funder", x="Amount", color="Type", orientation="h", text="Amount")

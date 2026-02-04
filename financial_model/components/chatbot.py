@@ -202,7 +202,7 @@ RECOMMENDATIONS TO MENTION WHEN RELEVANT:
                 <div class="chat-container" role="log" aria-label="Chat conversation" aria-live="polite" aria-relevant="additions">
             """, unsafe_allow_html=True)
 
-            chat_container = st.sidebar.container(height=400)
+            chat_container = st.sidebar.container()
             with chat_container:
                 for idx, msg in enumerate(st.session_state.chat_history[-6:]):  # Show last 6 messages
                     role = msg["role"]
