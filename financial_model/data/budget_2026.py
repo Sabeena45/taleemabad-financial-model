@@ -1,6 +1,6 @@
 """
 Taleemabad Budget 2026 Data
-Source: Taleemabad Budget 2026_v2.0_Draft_Baseline_Internal.pdf
+Source: Taleemabad Budget 2026_v2.0 Google Sheet (ID: 1hqgmD7jKuCO3BVrkPpWZbQfjaxYDPf76oMZut_7QI-4)
 Updated: January 2026
 
 IMPORTANT: All data in this file comes ONLY from the budget PDF.
@@ -65,7 +65,7 @@ GRANT_INCOME = {
     "mulago": {
         "amount": 950000,
         "timing": {
-            "Feb": 700000,
+            "Apr": 700000,
             "Nov": 250000,
         },
         "notes": "Grant agreement"
@@ -73,9 +73,9 @@ GRANT_INCOME = {
     "niete_ict": {
         "amount": 638535,
         "timing": {
-            "Jan": 244723,
-            "Mar": 189587,
-            "Apr": 204225,
+            "Feb": 244723,
+            "Apr": 189587,
+            "Jun": 204225,
         },
         "notes": "Revenue from Government Program - As per Agreement"
     },
@@ -106,21 +106,21 @@ PARTNER_REVENUE = {
     },
     "pen": {
         "monthly_usd": 1279,
-        "start_month": "Jul",
+        "start_month": "Jun",
         "end_month": "Dec",
         "schools": 200,
         "students": 8000,
-        "annual_total": 8952,  # 6 months (Jul-Dec)
-        "notes": "Expected to start from July 2026 onwards"
+        "annual_total": 8952,  # 7 months (Jun-Dec)
+        "notes": "Expected to start from June 2026 onwards"
     },
     "akhuwat": {
         "monthly_usd": 1599,
-        "start_month": "Jul",
+        "start_month": "Jun",
         "end_month": "Dec",
         "schools": 250,  # 250 of 300 schools to be onboarded
         "students": 10000,
-        "annual_total": 11190,  # 6 months (Jul-Dec)
-        "notes": "Has 300 schools, 250 expected onboarded. Starts July 2026"
+        "annual_total": 11190,  # 7 months (Jun-Dec)
+        "notes": "Has 300 schools, 250 expected onboarded. Starts June 2026"
     },
     "world_bank": {
         "monthly_usd": 12367,
@@ -163,8 +163,8 @@ RENTAL_INCOME = {
         "timing": {
             "Jan": 5830,
             "Apr": 6472,
-            "Jun": 6472,
-            "Sep": 6472,
+            "Jul": 6472,
+            "Oct": 6472,
         }
     },
 }
@@ -215,7 +215,7 @@ PROJECTED_SURPLUS = 1265175  # USD at end of 2026
 # Headcount (Page 2, Page 6-9)
 HEADCOUNT = {
     "jan_jun_2026": {
-        "total": 222,
+        "total": 203,
         "core": 126,  # Excluding NIETE ICT project staff
         "by_department": {
             "a_and_f": 8,
@@ -234,7 +234,7 @@ HEADCOUNT = {
         }
     },
     "jul_dec_2026": {
-        "total": 160,
+        "total": 117,
         "core": 111,
         "by_department": {
             "a_and_f": 7,
