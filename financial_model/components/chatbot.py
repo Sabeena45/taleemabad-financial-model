@@ -82,12 +82,9 @@ STYLE:
 - Format numbers with $ and commas
 
 If asked to explain a tab:
-- Executive Summary: Overview of 2026 budget health
-- Cash Flow: Month-by-month inflows/outflows
-- Scenarios: Stress-test the budget (optimistic/pessimistic)
-- Grant Dependency: Analyze risk if grants fall through
-- Runway: Calculate how long money lasts
-- Growth: Plan expansion and funding needs
+- Dashboard: Overview of 2026 budget health, key metrics, cash flow chart, expense breakdown
+- Financial Planning: Cash flow forecast, scenario analysis (stress-test), runway calculator
+- Programs & Funding: Growth scenarios, cost per child, NIETE ICT contract, grant dependency risk
 - Insights & Audit: AI-powered analysis with cost optimization recommendations
 
 RECOMMENDATIONS TO MENTION WHEN RELEVANT:
@@ -263,35 +260,22 @@ RECOMMENDATIONS TO MENTION WHEN RELEVANT:
     def _get_suggested_questions(self, current_tab: str) -> List[str]:
         """Get suggested questions based on current tab."""
         suggestions = {
-            "Executive Summary": [
+            "Dashboard": [
                 "What's our financial health for 2026?",
                 "Explain the key metrics",
                 "How much money do we have?"
             ],
-            "Cash Flow Forecasting": [
-                "When do we receive grants?",
-                "Which months are tight?",
-                "Explain cash flow basics"
-            ],
-            "Scenario Analysis": [
+            "Financial Planning": [
+                "What's our cash flow situation?",
+                "How long can we survive?",
                 "What's the worst case scenario?",
-                "How do I stress-test the budget?",
                 "What if revenue drops 20%?"
             ],
-            "Grant Dependency Analysis": [
+            "Programs & Funding": [
+                "What's our cost per child?",
                 "What if we lose Mulago?",
                 "Are we too dependent on one grant?",
-                "Which grants are critical?"
-            ],
-            "Runway Calculator": [
-                "How long can we survive?",
-                "Explain runway calculation",
-                "What's our burn rate?"
-            ],
-            "Growth Scenarios": [
-                "What's our cost per child?",
-                "How much to reach 200K students?",
-                "Explain NIETE ICT contract"
+                "How much to reach 200K students?"
             ],
             "Insights & Audit": [
                 "Where can we cut costs?",
