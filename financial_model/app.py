@@ -43,6 +43,7 @@ from data.budget_2026 import (
     FUNDRAISING_TARGET,
     BANK_BALANCES,
     EXPENSES,
+    NON_SALARY_BREAKDOWN,
     SUBSCRIPTIONS,
 )
 from models.cashflow_model import CashFlowModel
@@ -437,7 +438,7 @@ with tab1:
     **Key Observations:**
     - Head Office accounts for 66% of total expenses ($1.69M)
     - Salaries are 46% of total budget ($1.19M)
-    - Non-salary expenses ($500K) lack itemized breakdown - needs audit
+    - Non-salary expenses ($500K): largest items are Employee Wellbeing ($127K), Office Expense ($117K), AI Cost ($84K)
     - Program costs are 34% of budget, covering 127K students
     """)
 
@@ -916,14 +917,20 @@ with tab4:
         st.markdown("### Where Is the Money Going?")
 
         # Head Office breakdown
+        # Head Office = Salaries ($1,185,942) + Non-Salary sub-items ($499,598)
+        # Salaries includes all dept salaries (Product, Strategy, etc.)
+        # Non-Salary breakdown shown as individual items for visibility
         head_office_breakdown = pd.DataFrame([
-            {"Category": "Salaries (Dev Teams)", "Amount": EXPENSES["salaries_development_teams"], "% of Total": EXPENSES["salaries_development_teams"]/TOTAL_EXPENSES*100},
-            {"Category": "Non-Salary Expenses", "Amount": EXPENSES["non_salary_expenses"], "% of Total": EXPENSES["non_salary_expenses"]/TOTAL_EXPENSES*100},
-            {"Category": "Product", "Amount": EXPENSES["product"], "% of Total": EXPENSES["product"]/TOTAL_EXPENSES*100},
-            {"Category": "Employee Wellbeing", "Amount": EXPENSES["employee_wellbeing"], "% of Total": EXPENSES["employee_wellbeing"]/TOTAL_EXPENSES*100},
-            {"Category": "Strategy", "Amount": EXPENSES["strategy"], "% of Total": EXPENSES["strategy"]/TOTAL_EXPENSES*100},
-            {"Category": "Subscriptions", "Amount": EXPENSES["subscriptions"], "% of Total": EXPENSES["subscriptions"]/TOTAL_EXPENSES*100},
-            {"Category": "Tax", "Amount": EXPENSES["tax"], "% of Total": EXPENSES["tax"]/TOTAL_EXPENSES*100},
+            {"Category": "Salaries", "Amount": EXPENSES["salaries_development_teams"]},
+            {"Category": "Employee Wellbeing", "Amount": NON_SALARY_BREAKDOWN["employee_wellbeing"]},
+            {"Category": "Office Expense", "Amount": NON_SALARY_BREAKDOWN["office_expense"]},
+            {"Category": "AI Cost", "Amount": NON_SALARY_BREAKDOWN["ai_cost"]},
+            {"Category": "Utilities", "Amount": NON_SALARY_BREAKDOWN["utilities"]},
+            {"Category": "Subscriptions", "Amount": NON_SALARY_BREAKDOWN["subscriptions"]},
+            {"Category": "CAPEX", "Amount": NON_SALARY_BREAKDOWN["capex"]},
+            {"Category": "Travel", "Amount": NON_SALARY_BREAKDOWN["travel"]},
+            {"Category": "Tax", "Amount": NON_SALARY_BREAKDOWN["tax"]},
+            {"Category": "Legal & Professional", "Amount": NON_SALARY_BREAKDOWN["legal_professional"]},
         ])
 
         col1, col2 = st.columns([1, 1])
@@ -962,8 +969,17 @@ with tab4:
         **🔴 Red Flags Identified**
 
         1. **Non-Salary Expenses: ${EXPENSES['non_salary_expenses']:,}** (20% of budget)
-           - No itemized breakdown available in budget
-           - **Action:** Request detailed breakdown from finance team
+           | Category | Amount |
+           |----------|--------|
+           | Employee Wellbeing | $126,847 |
+           | Office Expense | $116,618 |
+           | AI Cost | $84,120 |
+           | Utilities | $46,253 |
+           | Subscriptions | $44,616 |
+           | CAPEX | $26,502 |
+           | Travel | $24,558 |
+           | Tax | $18,290 |
+           | Legal & Professional | $11,794 |
 
         2. **Program Operations Breakdown (${EXPENSES['program_operations']:,} total):**
            | Program | Cost | Students | Cost/Student |
@@ -1170,9 +1186,9 @@ with tab4:
            - Cannot calculate cost efficiency without it
            - Action: Request from programs team
 
-        3. **Itemize Non-Salary Expenses**
-           - $499K with no breakdown
-           - Action: Request detailed list from finance
+        3. **Review Employee Wellbeing spend**
+           - $127K (25% of non-salary expenses)
+           - Action: Benchmark against industry standards
         """)
 
     with rec_col2:
@@ -1210,14 +1226,14 @@ Generated: {datetime.now().strftime('%Y-%m-%d %H:%M')}
 - Potential Savings: $19,200-$28,800/year
 
 ## Red Flags
-1. Non-Salary Expenses: ${EXPENSES['non_salary_expenses']:,} (no itemization)
+1. Non-Salary Expenses: ${EXPENSES['non_salary_expenses']:,} (itemized — largest: Wellbeing $127K, Office $117K, AI $84K)
 2. Programs Other: ${EXPENSES['programs_other']:,} (student count TBD)
 3. Grant Concentration: {top_2_pct:.0f}% from 2 funders
 
 ## Recommendations
 1. Consolidate LLM providers (save $19-29K/year)
 2. Get Programs Other student count
-3. Itemize Non-Salary Expenses
+3. Review Employee Wellbeing spend ($127K = 25% of non-salary)
 4. Review Engineering headcount post-June
 5. Diversify grant portfolio (<25% per funder)
 """

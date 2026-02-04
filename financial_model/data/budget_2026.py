@@ -174,17 +174,12 @@ TOTAL_INFLOWS = 3101282  # USD
 
 # Expense categories (Summary sheet)
 EXPENSES = {
-    # --- Head Office ---
-    "salaries_development_teams": 1185942,
-    "product": 144032,
-    "strategy": 59051,
-    "non_salary_expenses": 499598,
-    "employee_wellbeing": 126847,
-    "subscriptions": 44616,
-    "tax": 18290,
+    # --- Head Office ($1,685,539) = Salaries + Non-Salary ---
+    "salaries_development_teams": 1185942,  # Includes all dept salaries (Product, Strategy, etc.)
+    "non_salary_expenses": 499598,  # See NON_SALARY_BREAKDOWN for itemization
     "subtotal_head_office": 1685539,
 
-    # --- Program Operations (combined total) ---
+    # --- Program Operations ($873,817) = NIETE ICT + Prevail + Other ---
     # program_operations = niete_ict + prevail_rawalpindi + programs_other
     "program_operations": 873817,
 
@@ -192,6 +187,20 @@ EXPENSES = {
     "niete_ict": 405793,
     "prevail_rawalpindi": 217423,  # Includes Akademos data collection ($95,406)
     "programs_other": 250601,
+}
+
+# Non-Salary Expenses breakdown (Summary sheet)
+# Sub-items of non_salary_expenses ($499,598) — do NOT add to total separately
+NON_SALARY_BREAKDOWN = {
+    "office_expense": 116618,
+    "utilities": 46253,
+    "ai_cost": 84120,
+    "employee_wellbeing": 126847,
+    "subscriptions": 44616,
+    "capex": 26502,
+    "travel": 24558,
+    "tax": 18290,
+    "legal_professional": 11794,
 }
 
 # Total expenses (Page 3)
@@ -512,6 +521,7 @@ __all__ = [
     "RENTAL_INCOME",
     "TOTAL_INFLOWS",
     "EXPENSES",
+    "NON_SALARY_BREAKDOWN",
     "TOTAL_EXPENSES",
     "MONTHLY_EXPENSES",
     "PROJECTED_SURPLUS",
