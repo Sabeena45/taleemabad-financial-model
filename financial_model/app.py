@@ -417,10 +417,8 @@ with tab1:
 
     expense_df = pd.DataFrame([
         {"Category": "Head Office (Salaries + Ops)", "Amount": EXPENSES["subtotal_head_office"]},
-        {"Category": "Program Operations", "Amount": EXPENSES["program_operations"]},
         {"Category": "NIETE ICT", "Amount": EXPENSES["niete_ict"]},
         {"Category": "Prevail Rawalpindi", "Amount": EXPENSES["prevail_rawalpindi"]},
-        {"Category": "Data Collection", "Amount": EXPENSES["data_collection"]},
         {"Category": "Programs (Other)", "Amount": EXPENSES["programs_other"]},
     ])
 
@@ -943,12 +941,10 @@ with tab4:
             st.plotly_chart(fig, use_container_width=True)
 
         with col2:
-            st.markdown("**Program Costs ($874K = 34% of budget)**")
+            st.markdown("**Program Operations ($874K = 34% of budget)**")
             program_breakdown = pd.DataFrame([
-                {"Category": "Programme Operations", "Amount": EXPENSES["program_operations"]},
                 {"Category": "NIETE ICT", "Amount": EXPENSES["niete_ict"]},
                 {"Category": "Prevail Rawalpindi", "Amount": EXPENSES["prevail_rawalpindi"]},
-                {"Category": "Data Collection", "Amount": EXPENSES["data_collection"]},
                 {"Category": "Programs Other", "Amount": EXPENSES["programs_other"]},
             ])
             fig = px.pie(
@@ -969,13 +965,14 @@ with tab4:
            - No itemized breakdown available in budget
            - **Action:** Request detailed breakdown from finance team
 
-        2. **Programme Operations vs NIETE ICT:**
+        2. **Program Operations Breakdown (${EXPENSES['program_operations']:,} total):**
            | Program | Cost | Students | Cost/Student |
            |---------|------|----------|--------------|
-           | Programme Ops | ${EXPENSES['program_operations']:,} | ??? | Unknown |
            | NIETE ICT | ${EXPENSES['niete_ict']:,} | 90,000 | $4.51 |
+           | Prevail Rawalpindi | ${EXPENSES['prevail_rawalpindi']:,} | 37,000 | $5.88 |
+           | Programs Other | ${EXPENSES['programs_other']:,} | TBD | TBD |
 
-           **Issue:** Programme Operations is 2× NIETE ICT cost but student count unknown
+           **Note:** Program Operations is the combined total of the above three sub-items
         """)
 
     # HEADCOUNT EFFICIENCY
@@ -1060,10 +1057,10 @@ with tab4:
                 "Duration": "Aug 2025 - Jun 2027",
             },
             {
-                "Program": "Programme Operations",
-                "Students": "Unknown",
-                "2026 Budget": EXPENSES["program_operations"],
-                "Cost/Child/Year": "Cannot calculate",
+                "Program": "Programs Other",
+                "Students": "TBD",
+                "2026 Budget": EXPENSES["programs_other"],
+                "Cost/Child/Year": "TBD",
                 "Duration": "Ongoing",
             },
         ])
@@ -1214,12 +1211,12 @@ Generated: {datetime.now().strftime('%Y-%m-%d %H:%M')}
 
 ## Red Flags
 1. Non-Salary Expenses: ${EXPENSES['non_salary_expenses']:,} (no itemization)
-2. Programme Operations: ${EXPENSES['program_operations']:,} (student count unknown)
+2. Programs Other: ${EXPENSES['programs_other']:,} (student count TBD)
 3. Grant Concentration: {top_2_pct:.0f}% from 2 funders
 
 ## Recommendations
 1. Consolidate LLM providers (save $19-29K/year)
-2. Get Programme Ops student count
+2. Get Programs Other student count
 3. Itemize Non-Salary Expenses
 4. Review Engineering headcount post-June
 5. Diversify grant portfolio (<25% per funder)

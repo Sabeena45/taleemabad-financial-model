@@ -172,8 +172,9 @@ RENTAL_INCOME = {
 # Total inflows for 2026 (Page 3)
 TOTAL_INFLOWS = 3101282  # USD
 
-# Expense categories (Page 3)
+# Expense categories (Summary sheet)
 EXPENSES = {
+    # --- Head Office ---
     "salaries_development_teams": 1185942,
     "product": 144032,
     "strategy": 59051,
@@ -183,10 +184,13 @@ EXPENSES = {
     "tax": 18290,
     "subtotal_head_office": 1685539,
 
+    # --- Program Operations (combined total) ---
+    # program_operations = niete_ict + prevail_rawalpindi + programs_other
     "program_operations": 873817,
+
+    # Sub-items of program_operations (do NOT add to total separately):
     "niete_ict": 405793,
-    "prevail_rawalpindi": 217423,
-    "data_collection": 95406,  # Akademos
+    "prevail_rawalpindi": 217423,  # Includes Akademos data collection ($95,406)
     "programs_other": 250601,
 }
 
