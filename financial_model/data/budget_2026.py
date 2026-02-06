@@ -308,9 +308,11 @@ NIETE_ICT_CONTRACT = {
 # Unit economics - Cost per child PER YEAR
 # NIETE ICT (Islamabad): Apr 2024 - Jun 2026 (27 months = 2.25 years)
 # Prevail Rawalpindi: Aug 2025 - Jun 2027 (23 months = 1.92 years)
+# Moawin: Revenue-generating partner (cost is platform overhead allocation)
 UNIT_ECONOMICS = {
     "niete_ict": {
         "students": 90000,
+        "schools": 465,
         "total_contract_usd": 2726287,  # 771,376,857 PKR at 283
         "fixed_costs_usd": 574360,
         "variable_costs_usd": 2151352,
@@ -325,12 +327,18 @@ UNIT_ECONOMICS = {
         "duration_months": 27,
         "duration_years": 2.25,
         "location": "Islamabad",
+        "funder": "Government (NIETE)",
+        "model_type": "Government Contract",
     },
     "prevail_rawalpindi": {
         "students": 37000,
+        "schools": 100,
         "total_contract_usd": 250000,
+        "fixed_costs_usd": 0,
+        "variable_costs_usd": 250000,
         # Per-year costs (primary metric)
         "cost_per_child": 3.53,  # USD/year (total contract / students / 1.92 years)
+        "cost_per_child_total": 3.53,
         # Full contract costs (for reference)
         "cost_per_child_contract": 6.76,  # USD total (total contract / students)
         "start_date": "Aug 2025",
@@ -338,6 +346,46 @@ UNIT_ECONOMICS = {
         "duration_months": 23,
         "duration_years": 1.92,
         "location": "Rawalpindi",
+        "funder": "Prevail Partners",
+        "model_type": "Foundation Grant",
+    },
+    "moawin": {
+        "students": 7024,
+        "schools": 179,
+        "total_contract_usd": 13474,  # Annual revenue, not cost
+        "fixed_costs_usd": 0,
+        "variable_costs_usd": 13474,
+        # Revenue per child (this is INCOME, not cost)
+        "revenue_per_child": 1.92,  # USD/year ($13,474 / 7,024 students)
+        # Estimated delivery cost (platform overhead allocation)
+        "cost_per_child": 1.50,  # Estimated - minimal marginal cost
+        "cost_per_child_total": 1.50,
+        "start_date": "Jan 2026",
+        "end_date": "Dec 2026",
+        "duration_months": 12,
+        "duration_years": 1.0,
+        "location": "Punjab",
+        "funder": "Private Partner (Revenue)",
+        "model_type": "Private Partner",
+        "notes": "Revenue-generating partner. Cost is platform overhead allocation.",
+    },
+    # Placeholder for Balochistan - to be filled with actual data
+    "balochistan_wsp": {
+        "students": 0,  # TODO: Add actual student count
+        "schools": 0,  # TODO: Add actual school count
+        "total_contract_usd": 0,  # TODO: Add contract value
+        "fixed_costs_usd": 0,
+        "variable_costs_usd": 0,
+        "cost_per_child": 0,  # TODO: Calculate
+        "cost_per_child_total": 0,
+        "start_date": "TBD",
+        "end_date": "TBD",
+        "duration_months": 0,
+        "duration_years": 0,
+        "location": "Balochistan",
+        "funder": "TBD",
+        "model_type": "TBD",
+        "notes": "Placeholder - awaiting budget data",
     },
 }
 
@@ -383,23 +431,11 @@ FUNDRAISING_PIPELINE = {
         "probability": 0.5,  # 50-50
         "notes": "50-50 - Probably near december 2025"
     },
-    "gsma": {
-        "amount": 331000,
-        "type": "New",
-        "timing": None,
-        "notes": "Leave"
-    },
     "vitol": {
         "amount": 200000,
         "type": "New",
         "timing": "Mar/Apr 2026",
         "notes": "Will be next year 2026 near march or April"
-    },
-    "agency_fund_youth_impact": {
-        "amount": 250000,
-        "type": "New",
-        "timing": None,
-        "notes": "Leave"
     },
     "deficit": {
         "amount": 319000,
