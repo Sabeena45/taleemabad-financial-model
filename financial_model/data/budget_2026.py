@@ -490,6 +490,49 @@ SUBSCRIPTIONS = {
     },
 }
 
+# AI-Built Products — What the $84K AI spend actually builds
+AI_BUILT_PRODUCTS = {
+    "rumi": {
+        "name": "Rumi AI Coach",
+        "team_size": 1,
+        "build_time_months": 3,
+        "users": 1878,
+        "conversations": 40949,
+        "tables": 60,
+        "traditional_team_estimate": 10,
+    },
+    "balochistan_wsp": {
+        "name": "Balochistan Winter School App",
+        "team_size": 1.5,
+        "build_time_months": 2,
+        "observations": 2517,
+        "tables": 23,
+        "traditional_team_estimate": 5,
+    },
+    "schoolpilot": {
+        "name": "SchoolPilot",
+        "team_size": 4,
+        "build_time_months": 12,
+        "schools": 232,
+        "tables": 49,
+        "traditional_team_estimate": 10,
+    },
+}
+
+# AI ROI Analysis — comparing AI spend to equivalent labor costs
+AI_ROI = {
+    "annual_ai_spend": 84120,
+    "team_size_with_ai": 6.5,          # actual people building/running AI products
+    "traditional_team_needed": 25,      # estimated without AI tools
+    "virtual_ftes_added": 8,            # conservative estimate of equivalent FTEs
+    "estimated_savings_low": 130000,    # conservative (USD/year)
+    "estimated_savings_high": 230000,   # aggressive (USD/year)
+    "avg_pakistan_dev_salary": 20000,    # USD/year
+    "ai_cost_per_employee": 523,        # $84,120 / 161 avg headcount
+    "headcount_avg": 161,               # (203 + 117) / 2 (H1 + H2 average)
+    "benefits_to_cost_ratio": 2.1,      # midpoint of 1.5-2.7x range
+}
+
 # Monthly cash position projection (Page 3)
 MONTHLY_CASH_POSITION = {
     "Jan": {"income_at_disposal": 930201, "expenses": 257913, "surplus": 672288},
@@ -568,6 +611,8 @@ __all__ = [
     "FUNDRAISING_TARGET",
     "MONTHLY_INFLOWS",
     "SUBSCRIPTIONS",
+    "AI_BUILT_PRODUCTS",
+    "AI_ROI",
     "MONTHLY_CASH_POSITION",
     "REVENUE_CHANGES",
 ]

@@ -42,6 +42,8 @@ from data.budget_2026 import (
     EXPENSES,
     NON_SALARY_BREAKDOWN,
     SUBSCRIPTIONS,
+    AI_BUILT_PRODUCTS,
+    AI_ROI,
 )
 from models.cashflow_model import CashFlowModel
 from models.scenario_model import ScenarioModel, ScenarioType
@@ -396,7 +398,62 @@ with st.expander("📊 **Program Efficiency** — Cost per child comparison", ex
         st.write(f"- At Rawalpindi rate: **{format_currency(add_100k)}/year**")
         st.write(f"- At NIETE rate: **{format_currency(100000 * 10.62)}/year**")
 
-# TAB 4: What-if scenarios
+# TAB 4: AI Investment ROI
+with st.expander("🤖 **AI Investment ROI** — What $84K in AI tools delivers", expanded=False):
+    col1, col2 = st.columns([2, 1])
+
+    with col1:
+        # Team comparison chart
+        products = []
+        for key, prod in AI_BUILT_PRODUCTS.items():
+            products.append({"Product": prod["name"], "Type": "Actual Team", "People": prod["team_size"]})
+            products.append({"Product": prod["name"], "Type": "Without AI", "People": prod["traditional_team_estimate"]})
+
+        team_df = pd.DataFrame(products)
+
+        fig = px.bar(
+            team_df,
+            y="Product",
+            x="People",
+            color="Type",
+            barmode="group",
+            orientation="h",
+            text="People",
+            color_discrete_map={"Actual Team": "#10B981", "Without AI": "#E5E7EB"},
+        )
+        fig.update_traces(textposition="outside")
+        fig.update_layout(
+            height=250,
+            margin=dict(l=0, r=40, t=20, b=0),
+            showlegend=True,
+            legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
+            yaxis_title=None,
+            xaxis_title="Team Size (people)",
+        )
+        st.plotly_chart(fig, use_container_width=True)
+
+        st.caption("AI tools enable 6.5 people to do the work of 25 — a **3.8× multiplier**")
+
+    with col2:
+        st.markdown(f"""
+        <p class="hero-number hero-green">{AI_ROI['benefits_to_cost_ratio']}×</p>
+        <p class="hero-label">ROI ON AI SPEND</p>
+        """, unsafe_allow_html=True)
+
+        st.metric("AI Spend / Employee", f"${AI_ROI['ai_cost_per_employee']}/year",
+                  help=f"${AI_ROI['annual_ai_spend']:,} ÷ {AI_ROI['headcount_avg']} avg headcount")
+        st.metric("Virtual FTEs Added", f"+{AI_ROI['virtual_ftes_added']}",
+                  help="Equivalent full-time employees replaced by AI tools")
+        st.metric("Estimated Savings", f"${AI_ROI['estimated_savings_low']/1000:.0f}-{AI_ROI['estimated_savings_high']/1000:.0f}K/year")
+
+    st.success(f"""
+    **Key Insight:** Every $1 spent on AI tools saves $1.50-2.70 in equivalent labor costs.
+    At **${AI_ROI['ai_cost_per_employee']}/employee/year**, AI tools are the highest-ROI line item in the budget.
+
+    **Products built with AI:** Rumi (1,878 users, 40K+ conversations), Balochistan WSP (2,517 observations), SchoolPilot (232 schools)
+    """)
+
+# TAB 5: What-if scenarios
 with st.expander("🎯 **What-If Analysis** — Scenario planning", expanded=False):
     scenario_model = ScenarioModel()
     scenario_model.run_all_scenarios()
@@ -434,7 +491,7 @@ with st.expander("🎯 **What-If Analysis** — Scenario planning", expanded=Fal
         if custom_surplus < 0:
             st.error("⚠️ This scenario results in a deficit!")
 
-# TAB 5: Key risks
+# TAB 6: Key risks
 with st.expander("⚠️ **Key Risks** — What could go wrong", expanded=False):
     st.markdown("""
     | Risk | Impact | Mitigation |
@@ -483,6 +540,13 @@ RISK FACTORS
 EFFICIENCY
 - Avg cost per child: ${avg_cost:.2f}/year
 - Students reached: {current_students:,}
+
+AI INVESTMENT ROI
+- Annual AI spend: ${AI_ROI['annual_ai_spend']:,}
+- AI cost per employee: ${AI_ROI['ai_cost_per_employee']}/year
+- ROI: {AI_ROI['benefits_to_cost_ratio']}x
+- Virtual FTEs added: {AI_ROI['virtual_ftes_added']}
+- Estimated savings: ${AI_ROI['estimated_savings_low']:,}-${AI_ROI['estimated_savings_high']:,}/year
 """
     st.download_button("📥 Export Summary", audit_text, file_name="budget_summary.txt",
                        mime="text/plain", use_container_width=True)
